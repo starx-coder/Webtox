@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Webtox browser</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0a0c10;
+  --surface:#111318;
+  --card:#16191f;
+  --border:#2a2d36;
+  --accent:#00e5ff;
+  --accent2:#7c3aed;
+  --accent3:#ff3d71;
+  --text:#e8eaf0;
+  --muted:#6b7280;
+}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── AD BANNER ── */
+#ad-banner{
+  width:100%;
+  background:#0d0f14;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 0;
+  min-height:58px;
+}
+
+/* ── APP HEADER ── */
+#app-header{
+  text-align:center;
+  padding:14px 20px 4px;
+}
+.app-name{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2rem,8vw,3.8rem);
+  font-weight:800;
+  letter-spacing:-2px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  display:inline-block;
+}
+.app-name span{
+  display:inline-block;
+  animation:letterPop .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes letterPop{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.app-tagline{
+  color:var(--muted);
+  font-size:.75rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-top:4px;
+}
+
+/* ── DISCLAIMER OVERLAY ── */
+#disclaimer-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(10,12,16,.97);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.disc-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:24px 20px 20px;
+  width:100%;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+}
+.disc-icon{
+  font-size:2.6rem;
+  color:var(--accent3);
+  margin-bottom:10px;
+  display:block;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.disc-card h2{
+  font-family:'Syne',sans-serif;
+  font-size:1.25rem;
+  color:var(--accent3);
+  margin-bottom:6px;
+}
+.disc-card p{font-size:.82rem;color:var(--muted);line-height:1.55;margin-bottom:4px}
+.disc-list{text-align:left;list-style:none;margin:10px 0}
+.disc-list li{
+  font-size:.78rem;color:var(--muted);
+  padding:4px 0;display:flex;align-items:flex-start;gap:8px;line-height:1.4
+}
+.disc-list li i{color:var(--accent);margin-top:2px;flex-shrink:0}
+.btn-row{display:flex;gap:10px;margin-top:16px}
+.btn{
+  flex:1;padding:13px 10px;border:none;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .18s
+}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent3);color:var(--accent3)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-weight:700}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.3)}
+
+/* ── SCREENS ── */
+.screen{display:none;animation:fadeUp .4s ease both}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── INPUT SCREEN ── */
+#input-screen{max-width:540px;margin:0 auto;padding:16px 16px 120px}
+.input-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:22px 18px;box-shadow:0 8px 32px rgba(0,0,0,.4)
+}
+.input-card h3{
+  font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px
+}
+.input-card h3 i{color:var(--accent)}
+.url-wrap{position:relative;margin-bottom:18px}
+.url-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem}
+.url-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:11px;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.88rem;padding:12px 12px 12px 36px;outline:none;transition:border-color .2s
+}
+.url-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,.08)}
+.url-input::placeholder{color:var(--muted)}
+.sec-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:9px}
+.preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.preset-btn{
+  background:var(--surface);border:1px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;
+  padding:9px 4px;cursor:pointer;transition:all .15s;text-align:center
+}
+.preset-btn:hover,.preset-btn.sel{background:var(--accent);color:#000;border-color:var(--accent)}
+.custom-row{display:flex;gap:9px;margin-bottom:16px}
+.custom-input{
+  flex:1;background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;
+  padding:11px 12px;outline:none;transition:border-color .2s
+}
+.custom-input:focus{border-color:var(--accent2)}
+.custom-input::placeholder{color:var(--muted)}
+.btn-load{
+  width:100%;padding:14px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent3));
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s
+}
+.btn-load:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.35)}
+.btn-load:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* ── PLAYER SCREEN ── */
+#player-screen{padding:14px 12px 150px}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.back-btn{
+  background:var(--card);border:1px solid var(--border);border-radius:9px;
+  color:var(--text);font-size:.82rem;padding:7px 13px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:all .15s
+}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+.count-badge{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:4px 12px;font-size:.75rem;color:var(--muted)
+}
+.count-badge span{color:var(--accent);font-weight:700}
+
+/* ── GRID ── */
+#grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:600px){#grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){#grid{grid-template-columns:repeat(4,1fr)}}
+
+.p-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.4);
+  animation:cardIn .35s ease both
+}
+@keyframes cardIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.p-card iframe{width:100%;aspect-ratio:16/9;border:none;display:block}
+.p-foot{padding:5px 9px;display:flex;align-items:center}
+.p-num{font-size:.72rem;color:var(--muted)}
+.p-num i{color:var(--accent3);margin-right:4px}
+
+/* ── CONTROLS BAR ── */
+#ctrl-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(10,12,16,.95);backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+  padding:10px 12px 18px;
+  display:none;
+  gap:8px;
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+  flex-wrap:wrap;
+}
+.c-btn{
+  flex:1;min-width:90px;max-width:160px;
+  padding:12px 8px;border:none;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s
+}
+#btn-play{background:linear-gradient(135deg,#00e5ff,#0095a8);color:#000}
+#btn-pause{background:linear-gradient(135deg,#ff3d71,#a01040);color:#fff}
+#btn-mute{background:linear-gradient(135deg,#22c55e,#15803d);color:#fff}
+#btn-mute.muted{background:linear-gradient(135deg,#6b7280,#374151)}
+.c-btn:hover{transform:translateY(-2px)}
+
+/* ── FAB ── */
+#fab{
+  position:fixed;bottom:88px;right:16px;
+  width:50px;height:50px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--accent2),var(--accent3));
+  color:#fff;font-size:1.1rem;cursor:pointer;
+  box-shadow:0 6px 20px rgba(124,58,237,.45);
+  display:none;align-items:center;justify-content:center;
+  z-index:101;transition:all .2s
+}
+#fab:hover{transform:scale(1.12) rotate(90deg)}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;top:70px;left:50%;
+  transform:translateX(-50%) translateY(-16px);
+  background:var(--card);border:1px solid var(--accent);
+  color:var(--text);padding:9px 18px;border-radius:30px;
+  font-size:.82rem;opacity:0;pointer-events:none;
+  transition:all .28s;z-index:9000;white-space:nowrap;
+  display:flex;align-items:center;gap:7px
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── CSP WARNING ── */
+#csp-warn{
+  display:none;background:#1a0800;border-bottom:1px solid var(--accent3);
+  padding:9px 14px;text-align:center;font-size:.78rem;color:#ff9f43
+}
+#csp-warn code{background:#2a1000;padding:2px 7px;border-radius:4px;font-size:.74rem}
+
+/* ── NOTES BOX ── */
+#notes-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:14px;
+}
+.note-title{
+  font-size:.78rem;font-weight:600;color:var(--accent);
+  display:flex;align-items:center;gap:7px;margin-bottom:9px;
+  text-transform:uppercase;letter-spacing:1px;
+}
+.note-list{list-style:none;padding:0}
+.note-list li{
+  font-size:.76rem;color:var(--muted);
+  padding:3px 0;display:flex;align-items:center;gap:8px;line-height:1.4
+}
+.note-ok{color:#22c55e;font-size:.7rem;flex-shrink:0}
+.note-no{color:var(--accent3);font-size:.7rem;flex-shrink:0}
+.note-warn{color:#f59e0b;font-size:.7rem;flex-shrink:0}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- AD BANNER - Adsterra EXACT CODE -->
+<div id="ad-banner">
+  <script>
+	atOptions = {
+		'key' : 'aaf38d6bd4799ab425c4ee4aff44923d',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+  </script>
+  <script type="text/javascript" src="https://www.highperformanceformat.com/aaf38d6bd4799ab425c4ee4aff44923d/invoke.js"></script>
+</div>
+
+<!-- CSP WARNING (shown only on file://) -->
+<div id="csp-warn">
+  <i class="fa-solid fa-triangle-exclamation" style="color:var(--accent3);margin-right:6px"></i>
+  <strong>file:// se open mat karo!</strong> &nbsp;Run:&nbsp;
+  <code>python3 -m http.server 8080</code>&nbsp; then open &nbsp;<code>http://localhost:8080</code>
+</div>
+
+<!-- APP HEADER -->
+<div id="app-header">
+  <div class="app-name" id="app-name-el"></div>
+  <div class="app-tagline"><h1>webtox</h1></div>
+</div>
+
+<!-- DISCLAIMER OVERLAY -->
+<div id="disclaimer-overlay">
+  <div class="disc-card">
+    <i class="fa-solid fa-triangle-exclamation disc-icon"></i>
+    <h2>Disclaimer</h2>
+    <p>Please read before using <strong style="color:var(--accent)">Webtox</strong>.</p>
+    <ul class="disc-list">
+      <li><i class="fa-solid fa-circle-dot"></i>This app embeds YouTube videos via the official IFrame API. All content is subject to YouTube's Terms of Service.</li>
+      <li><i class="fa-solid fa-circle-dot"></i>We do not host or store any video. Videos stream directly from YouTube.</li>
+      <li><i class="fa-solid fa-circle-dot"></i>Loading many players uses bandwidth. Use responsibly.</li>
+      <li><i class="fa-solid fa-circle-dot"></i>For personal, educational, or legitimate testing only.</li>
+    </ul>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="btn-cancel">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>
+      <button class="btn btn-primary" id="btn-accept">
+        <i class="fa-solid fa-check"></i> I Understand
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT SCREEN -->
+<div id="input-screen" class="screen">
+  <div class="input-card">
+    <h3><i class="fa-brands fa-youtube"></i> Paste YouTube Link</h3>
+    <div class="url-wrap">
+      <i class="fa-solid fa-link"></i>
+      <input type="text" id="yt-url" class="url-input" placeholder="https://www.youtube.com/watch?v=..."/>
+    </div>
+
+    <div class="sec-label">Select number of players</div>
+    <div class="preset-grid" id="preset-grid"></div>
+
+    <div class="sec-label">Or enter custom number</div>
+    <div class="custom-row">
+      <input type="number" id="custom-count" class="custom-input" min="1" max="100" placeholder="e.g. 12"/>
+    </div>
+
+    <!-- NOTES -->
+    <div id="notes-box">
+      <div class="note-title"><i class="fa-solid fa-circle-info"></i> Important Notes</div>
+      <ul class="note-list">
+        <li><i class="fa-solid fa-check note-ok"></i> Regular YouTube videos supported</li>
+        <li><i class="fa-solid fa-xmark note-no"></i> YouTube Shorts not supported</li>
+        <li><i class="fa-solid fa-xmark note-no"></i> Live streams may not work properly</li>
+        <li><i class="fa-solid fa-xmark note-no"></i> Age-restricted / private videos won't load</li>
+        <li><i class="fa-solid fa-triangle-exclamation note-warn"></i> Must be opened via web server, not file://</li>
+        <li><i class="fa-solid fa-triangle-exclamation note-warn"></i> Videos start muted — tap Unmute for audio</li>
+      </ul>
+    </div>
+
+    <button class="btn-load" id="btn-load" onclick="loadPlayers()">
+      <i class="fa-solid fa-play"></i> Load Players
+    </button>
+  </div>
+</div>
+
+<!-- PLAYER SCREEN -->
+<div id="player-screen" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </button>
+    <div class="count-badge"><span id="p-count">0</span> players</div>
+  </div>
+  <div id="grid"></div>
+</div>
+
+<!-- CONTROLS BAR -->
+<div id="ctrl-bar">
+  <button class="c-btn" id="btn-play" onclick="playAll()">
+    <i class="fa-solid fa-circle-play"></i> Play All
+  </button>
+  <button class="c-btn" id="btn-pause" onclick="pauseAll()">
+    <i class="fa-solid fa-circle-pause"></i> Pause All
+  </button>
+  <button class="c-btn" id="btn-mute" onclick="toggleMute()">
+    <i class="fa-solid fa-volume-xmark"></i> Unmute
+  </button>
+</div>
+
+<!-- FAB -->
+<button id="fab" onclick="addOne()" title="Add one more player">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- TOAST -->
+<div id="toast"><i class="fa-solid fa-circle-check" id="toast-icon"></i><span id="toast-msg"></span></div>
+
+<!-- YOUTUBE API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+// ── Animated app name ──
+(function(){
+  var el = document.getElementById('app-name-el');
+  el.innerHTML = 'webtox'.split('').map(function(c,i){
+    return '<span style="animation-delay:'+(0.05+i*0.07)+'s">'+c+'</span>';
+  }).join('');
+})();
+
+// ── CSP file:// warning ──
+if(window.location.protocol==='file:'){
+  document.getElementById('csp-warn').style.display='block';
+}
+
+// ── Disclaimer buttons ──
+document.getElementById('btn-accept').addEventListener('click', function(){
+  document.getElementById('disclaimer-overlay').style.display='none';
+  showScreen('input-screen');
+});
+
+document.getElementById('btn-cancel').addEventListener('click', function(){
+  // Try to close tab
+  window.close();
+  // Fallback message
+  setTimeout(function(){
+    var ov = document.getElementById('disclaimer-overlay');
+    ov.innerHTML =
+      '<div style="text-align:center;padding:40px 20px;max-width:340px;">' +
+      '<i class="fa-solid fa-door-open" style="font-size:3rem;color:var(--accent);display:block;margin-bottom:16px;"></i>' +
+      '<p style="color:var(--muted);font-size:.95rem;margin-bottom:20px;">You can now close this tab.</p>' +
+      '<button onclick="document.getElementById(\'disclaimer-overlay\').style.display=\'none\';showScreen(\'input-screen\')" ' +
+      'style="background:var(--accent2);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:.9rem;cursor:pointer;">' +
+      '<i class="fa-solid fa-arrow-left"></i> Go Back</button></div>';
+  }, 400);
+});
+
+// ── Screen management ──
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+}
+
+function goBack(){
+  showScreen('input-screen');
+  document.getElementById('ctrl-bar').style.display='none';
+  document.getElementById('fab').style.display='none';
+}
+
+// ── Preset buttons ──
+var selectedCount = null;
+var PRESETS = [5,10,15,20,25,30,35,40];
+(function(){
+  var grid = document.getElementById('preset-grid');
+  PRESETS.forEach(function(n){
+    var b = document.createElement('button');
+    b.className='preset-btn';
+    b.textContent=n;
+    b.onclick=function(){
+      document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('sel')});
+      b.classList.add('sel');
+      selectedCount=n;
+      document.getElementById('custom-count').value='';
+    };
+    grid.appendChild(b);
+  });
+})();
+
+document.getElementById('custom-count').addEventListener('input',function(){
+  if(this.value){
+    document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('sel')});
+    selectedCount=null;
+  }
+});
+
+// ── Extract YouTube video ID ──
+function getVideoId(url){
+  url=url.trim();
+  var m;
+  m=url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/); if(m) return m[1];
+  m=url.match(/[?&]v=([A-Za-z0-9_-]{11})/);       if(m) return m[1];
+  m=url.match(/\/(?:embed|shorts|v)\/([A-Za-z0-9_-]{11})/); if(m) return m[1];
+  m=url.match(/^([A-Za-z0-9_-]{11})$/);           if(m) return m[1];
+  return null;
+}
+
+// ── Player state ──
+var iframes = [];
+var ytPlayers = [];
+var currentVid = null;
+var isMuted = true;
+var playerSeq = 0;
+
+// ── YT API ready callback ──
+window.onYouTubeIframeAPIReady = function(){
+  // Players already rendered as plain iframes; we'll wrap on demand
+  console.log('YT API ready');
+};
+
+// ── postMessage fallback for play/pause/mute ──
+function sendCmd(iframe, cmd){
+  try{
+    iframe.contentWindow.postMessage(
+      JSON.stringify({event:'command',func:cmd,args:[]}), '*'
+    );
+  }catch(e){}
+}
+
+// ── Load players ──
+function loadPlayers(){
+  var url = document.getElementById('yt-url').value.trim();
+  var custom = parseInt(document.getElementById('custom-count').value,10);
+  var count = (custom>0) ? custom : selectedCount;
+  var vid = getVideoId(url);
+
+  if(!vid){ toast('Paste a valid YouTube link','fa-triangle-exclamation'); return; }
+  if(!count||count<1){ toast('Select or enter number of players','fa-triangle-exclamation'); return; }
+
+  currentVid = vid;
+  iframes = [];
+  ytPlayers = [];
+  isMuted = true;
+
+  var grid = document.getElementById('grid');
+  grid.innerHTML='';
+
+  for(var i=0;i<count;i++) addCard(vid,i);
+
+  document.getElementById('p-count').textContent = count;
+  showScreen('player-screen');
+  document.getElementById('ctrl-bar').style.display='flex';
+  document.getElementById('fab').style.display='flex';
+
+  // Reset mute button
+  var mb = document.getElementById('btn-mute');
+  mb.innerHTML='<i class="fa-solid fa-volume-xmark"></i> Unmute';
+  mb.classList.add('muted');
+
+  toast(count+' players loaded! Tap Unmute for audio','fa-circle-check');
+}
+
+// ── Create one player card ──
+function addCard(vid, idx){
+  var num = iframes.length + 1;
+  var uid = 'ytf'+(++playerSeq);
+
+  // autoplay=1&mute=1 → starts immediately, muted (browser policy)
+  var origin = (window.location.origin && window.location.origin!=='null')
+               ? window.location.origin : 'https://www.youtube.com';
+  var src = 'https://www.youtube.com/embed/'+vid
+          +'?enablejsapi=1&autoplay=1&mute=1&rel=0&playsinline=1&origin='+encodeURIComponent(origin);
+
+  var card = document.createElement('div');
+  card.className='p-card';
+  card.style.animationDelay=(idx*0.03)+'s';
+  card.innerHTML=
+    '<iframe id="'+uid+'" src="'+src+'" frameborder="0" allowfullscreen '+
+    'allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>'+
+    '<div class="p-foot"><span class="p-num"><i class="fa-brands fa-youtube"></i>#'+num+'</span></div>';
+
+  document.getElementById('grid').appendChild(card);
+
+  var iframe = document.getElementById(uid);
+  iframes.push(iframe);
+  ytPlayers.push(null);
+
+  // Wrap with YT.Player if API already ready
+  if(window.YT && window.YT.Player){
+    (function(i,id){
+      ytPlayers[i] = new YT.Player(id,{events:{onReady:function(){}}});
+    })(iframes.length-1, uid);
+  }
+}
+
+// ── Controls ──
+function playAll(){
+  iframes.forEach(function(f,i){
+    var p=ytPlayers[i];
+    if(p && typeof p.unMute==='function'){ p.unMute(); p.setVolume(100); p.playVideo(); }
+    else{ sendCmd(f,'unMute'); sendCmd(f,'playVideo'); }
+  });
+  isMuted=false;
+  var mb=document.getElementById('btn-mute');
+  mb.innerHTML='<i class="fa-solid fa-volume-high"></i> Mute';
+  mb.classList.remove('muted');
+  toast('Playing all','fa-circle-play');
+}
+
+function pauseAll(){
+  iframes.forEach(function(f,i){
+    var p=ytPlayers[i];
+    if(p && typeof p.pauseVideo==='function') p.pauseVideo();
+    else sendCmd(f,'pauseVideo');
+  });
+  toast('Paused all','fa-circle-pause');
+}
+
+function toggleMute(){
+  isMuted=!isMuted;
+  var mb=document.getElementById('btn-mute');
+  iframes.forEach(function(f,i){
+    var p=ytPlayers[i];
+    if(isMuted){
+      if(p && typeof p.mute==='function') p.mute();
+      else sendCmd(f,'mute');
+    } else {
+      if(p && typeof p.unMute==='function'){ p.unMute(); p.setVolume(100); }
+      else sendCmd(f,'unMute');
+    }
+  });
+  if(isMuted){
+    mb.innerHTML='<i class="fa-solid fa-volume-xmark"></i> Unmute';
+    mb.classList.add('muted');
+    toast('Muted all','fa-volume-xmark');
+  } else {
+    mb.innerHTML='<i class="fa-solid fa-volume-high"></i> Mute';
+    mb.classList.remove('muted');
+    toast('Unmuted all','fa-volume-high');
+  }
+}
+
+function addOne(){
+  if(!currentVid) return;
+  addCard(currentVid, iframes.length);
+  document.getElementById('p-count').textContent=iframes.length;
+  toast('Player added!','fa-plus');
+}
+
+// ── Toast ──
+var _toastT=null;
+function toast(msg,icon){
+  icon=icon||'fa-circle-check';
+  document.getElementById('toast-icon').className='fa-solid '+icon;
+  document.getElementById('toast-msg').textContent=' '+msg;
+  var el=document.getElementById('toast');
+  el.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT=setTimeout(function(){el.classList.remove('show')},2800);
+}
+</script>
+
+</body>
+</html>
